@@ -20,6 +20,7 @@ import {
   PiGridFourDuotone,
   PiBookBookmarkDuotone,
   PiImageDuotone,
+  PiFileSqlDuotone,
 } from "react-icons/pi";
 
 import {
@@ -27,9 +28,12 @@ import {
   SiNextdotjs,
   SiFigma,
   SiSupabase,
+  SiPython,
+  SiTypescript,
+  SiDocker,
 } from "react-icons/si";
 
-import { FaDiscord, FaGithub, FaLinkedin, FaX, FaThreads, FaInstagram, FaXTwitter, FaFacebook, FaPinterest, FaWhatsapp, FaReddit, FaTelegram, } from "react-icons/fa6";
+import { FaAws, FaDiscord, FaGithub, FaLinkedin, FaX, FaThreads, FaInstagram, FaXTwitter, FaFacebook, FaPinterest, FaWhatsapp, FaReddit, FaTelegram, } from "react-icons/fa6";
 
 export const iconLibrary: Record<string, IconType> = {
   arrowUpRight: HiArrowUpRight,
@@ -57,6 +61,11 @@ export const iconLibrary: Record<string, IconType> = {
   javascript: SiJavascript,
   nextjs: SiNextdotjs,
   supabase: SiSupabase,
+  typescript: SiTypescript,
+  python: SiPython,
+  sql: PiFileSqlDuotone,
+  aws: FaAws,
+  docker: SiDocker,
   figma: SiFigma,
   facebook: FaFacebook,
   pinterest: FaPinterest,

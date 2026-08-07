@@ -37,7 +37,7 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ timeZone, locale = "en-GB" })
     return () => clearInterval(intervalId);
   }, [timeZone, locale]);
 
-  return <>{currentTime}</>;
+  return <>My current time : {currentTime}</>;
 };
 
 export default TimeDisplay;
@@ -115,7 +115,7 @@ export const Header = () => {
                     <ToggleButton
                       prefixIcon="grid"
                       href="/work"
-                      label={work.label}
+                      label={"Projects"}
                       selected={pathname.startsWith("/work")}
                     />
                   </Row>
