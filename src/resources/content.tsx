@@ -204,7 +204,7 @@ const about: About = {
       {
         name: "University of Ottawa",
         description: <>Honours Bachelor of Science in Computer Science (with Data Science Option) </>,
-        timeframe: "Graduated 2026",
+        timeframe: "",
       },
     ],
   },
