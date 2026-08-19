@@ -856,11 +856,20 @@ const blog: Blog = {
    WORK
 ========================================================= */
 
-const work: Work = {
-  path: "/work",
-  label: "Work",
-  title: "My personal projects",
-  description: `Design and dev projects by ${person.name}`,
+const work = {
+  en: {
+    path: "/work",
+    label: "Work",
+    title: "My personal projects",
+    description: `Design and dev projects by ${person.name}`,
+  },
+
+  fr: {
+    path: "/work",
+    label: "Projets",
+    title: "Mes projets personnels",
+    description: `Projets de développement et de conception de ${person.name}`,
+  },
 };
 
 /* =========================================================

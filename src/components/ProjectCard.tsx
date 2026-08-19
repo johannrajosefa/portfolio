@@ -10,6 +10,8 @@ import {
   Text,
 } from "@once-ui-system/core";
 
+import { useLanguage } from "@/components/LanguageContext";
+
 interface ProjectCardProps {
   href: string;
   priority?: boolean;
@@ -30,6 +32,21 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   avatars,
   link,
 }) => {
+  const { language } = useLanguage();
+
+  const labels = {
+    en: {
+      readCaseStudy: "Read case study",
+      viewProject: "View project",
+    },
+    fr: {
+      readCaseStudy: "Lire l'étude de cas",
+      viewProject: "Voir le projet",
+    },
+  };
+
+  const text = labels[language];
+
   return (
     <Column fillWidth gap="m">
       <Carousel
@@ -39,6 +56,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           alt: title,
         }))}
       />
+
       <Flex
         s={{ direction: "column" }}
         fillWidth
@@ -49,36 +67,66 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       >
         {title && (
           <Flex flex={5}>
-            <Heading as="h2" wrap="balance" variant="heading-strong-xl">
+            <Heading
+              as="h2"
+              wrap="balance"
+              variant="heading-strong-xl"
+            >
               {title}
             </Heading>
           </Flex>
         )}
-        {(avatars?.length > 0 || description?.trim() || content?.trim()) && (
+
+        {(avatars?.length > 0 ||
+          description?.trim() ||
+          content?.trim()) && (
           <Column flex={7} gap="16">
-            {avatars?.length > 0 && <AvatarGroup avatars={avatars} size="m" reverse />}
+            {avatars?.length > 0 && (
+              <AvatarGroup
+                avatars={avatars}
+                size="m"
+                reverse
+              />
+            )}
+
             {description?.trim() && (
-              <Text wrap="balance" variant="body-default-s" onBackground="neutral-weak">
+              <Text
+                wrap="balance"
+                variant="body-default-s"
+                onBackground="neutral-weak"
+              >
                 {description}
               </Text>
             )}
+
             <Flex gap="24" wrap>
               {content?.trim() && (
                 <SmartLink
                   suffixIcon="arrowRight"
-                  style={{ margin: "0", width: "fit-content" }}
+                  style={{
+                    margin: "0",
+                    width: "fit-content",
+                  }}
                   href={href}
                 >
-                  <Text variant="body-default-s">Read case study</Text>
+                  <Text variant="body-default-s">
+                    {text.readCaseStudy}
+                  </Text>
                 </SmartLink>
               )}
+
               {link && (
                 <SmartLink
                   suffixIcon="arrowUpRightFromSquare"
-                  style={{ margin: "0", width: "fit-content" }}
+                  style={{
+                    margin: "0",
+                    width: "fit-content",
+                  }}
                   href={link}
                 >
-                  <Text variant="body-default-s">View project</Text>
+                  <Text variant="body-default-s">
+                    {text.viewProject}
+                  </Text>
                 </SmartLink>
               )}
             </Flex>

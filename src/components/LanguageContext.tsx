@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 type Language = "en" | "fr";
 
@@ -19,10 +19,26 @@ export function LanguageProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [language, setLanguage] = useState<Language>("en");
+  const [language, setLanguageState] = useState<Language>("en");
+
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem("language");
+
+    if (savedLanguage === "en" || savedLanguage === "fr") {
+      setLanguageState(savedLanguage);
+    }
+  }, []);
+
+  const setLanguage = (newLanguage: Language) => {
+    setLanguageState(newLanguage);
+
+    localStorage.setItem("language", newLanguage);
+
+    document.cookie = `language=${newLanguage}; path=/; max-age=31536000; SameSite=Lax`;
+  };
 
   const toggleLanguage = () => {
-    setLanguage((current) => (current === "en" ? "fr" : "en"));
+    setLanguage(language === "en" ? "fr" : "en");
   };
 
   return (

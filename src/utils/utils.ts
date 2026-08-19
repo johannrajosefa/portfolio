@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import { notFound } from "next/navigation";
 
 type Team = {
   name: string;
@@ -21,14 +22,21 @@ type Metadata = {
   link?: string;
 };
 
-import { notFound } from "next/navigation";
+export type ProjectPost = {
+  metadata: Metadata;
+  slug: string;
+  content: string;
+  language: "en" | "fr";
+};
 
 function getMDXFiles(dir: string) {
   if (!fs.existsSync(dir)) {
     notFound();
   }
 
-  return fs.readdirSync(dir).filter((file) => path.extname(file) === ".mdx");
+  return fs
+    .readdirSync(dir)
+    .filter((file) => path.extname(file) === ".mdx");
 }
 
 function readMDXFile(filePath: string) {
@@ -54,21 +62,35 @@ function readMDXFile(filePath: string) {
   return { metadata, content };
 }
 
-function getMDXData(dir: string) {
+function getMDXData(dir: string): ProjectPost[] {
   const mdxFiles = getMDXFiles(dir);
+
   return mdxFiles.map((file) => {
-    const { metadata, content } = readMDXFile(path.join(dir, file));
-    const slug = path.basename(file, path.extname(file));
+    const { metadata, content } = readMDXFile(
+      path.join(dir, file)
+    );
+
+    const filename = path.basename(file, path.extname(file));
+
+    const isFrench = filename.endsWith(".fr");
+
+    const slug = isFrench
+      ? filename.replace(/\.fr$/, "")
+      : filename;
 
     return {
       metadata,
       slug,
       content,
+      language: isFrench ? "fr" : "en",
     };
   });
 }
 
-export function getPosts(customPath = ["", "", "", ""]) {
+export function getPosts(
+  customPath = ["", "", "", ""]
+): ProjectPost[] {
   const postsDir = path.join(process.cwd(), ...customPath);
+
   return getMDXData(postsDir);
 }
