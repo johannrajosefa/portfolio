@@ -10,8 +10,11 @@ import {
   Media,
   Tag,
   Text,
+  Meta,
+  Schema,
   Row,
 } from "@once-ui-system/core";
+
 import { baseURL, about, person, social } from "@/resources";
 import TableOfContents from "@/components/about/TableOfContents";
 import styles from "@/components/about/about.module.scss";
@@ -21,59 +24,33 @@ import { useLanguage } from "@/components/LanguageContext";
 export default function About() {
   const { language } = useLanguage();
 
-  /*
-   * Bilingual labels that are specific to this page.
-   * Your actual experience descriptions will be translated
-   * in the content object afterwards.
-   */
+  // Select the correct language version of the About content
+  const content = about[language];
 
-  const labels = {
-    en: {
-      schedule: "Schedule a call",
-      introduction: "Introduction",
-      work: "Work Experience",
-      education: "Education",
-      technical: "Technical Skills",
-    },
-    fr: {
-      schedule: "Planifier un appel",
-      introduction: "Introduction",
-      work: "Expérience professionnelle",
-      education: "Formation",
-      technical: "Compétences techniques",
-    },
-  };
-
-  const currentLabels = labels[language];
-
-  /*
-   * Create a version of the About structure using the
-   * translated section titles.
-   */
   const structure = [
     {
-      title: currentLabels.introduction,
-      display: about.intro.display,
+      title: content.intro.title,
+      display: content.intro.display,
       items: [],
     },
     {
-      title: currentLabels.work,
-      display: about.work.display,
-      items: about.work.experiences.map(
+      title: content.work.title,
+      display: content.work.display,
+      items: content.work.experiences.map(
         (experience) => experience.company
       ),
     },
     {
-      title: currentLabels.education,
-      display: about.studies.display,
-      items: about.studies.institutions.map(
+      title: content.studies.title,
+      display: content.studies.display,
+      items: content.studies.institutions.map(
         (institution) => institution.name
       ),
     },
     {
-      title: currentLabels.technical,
-      display: about.technical.display,
-      items: about.technical.skills.map(
+      title: content.technical.title,
+      display: content.technical.display,
+      items: content.technical.skills.map(
         (skill) => skill.title
       ),
     },
@@ -81,8 +58,24 @@ export default function About() {
 
   return (
     <Column maxWidth="m">
-      {/* TABLE OF CONTENTS */}
-      {about.tableOfContent.display && (
+      <Schema
+        as="webPage"
+        baseURL={baseURL}
+        title={content.title}
+        description={content.description}
+        path={content.path}
+        image={`/api/og/generate?title=${encodeURIComponent(
+          content.title
+        )}`}
+        author={{
+          name: person.name,
+          url: `${baseURL}${content.path}`,
+          image: `${baseURL}${person.avatar}`,
+        }}
+      />
+
+      {/* Table of contents */}
+      {content.tableOfContent.display && (
         <Column
           left="0"
           style={{
@@ -96,19 +89,18 @@ export default function About() {
         >
           <TableOfContents
             structure={structure}
-            about={about}
+            about={content}
           />
         </Column>
       )}
 
-      {/* MAIN CONTENT */}
       <Row
         fillWidth
         s={{ direction: "column" }}
         horizontal="center"
       >
-        {/* PROFILE COLUMN */}
-        {about.avatar.display && (
+        {/* LEFT PROFILE COLUMN */}
+        {content.avatar.display && (
           <Column
             className={styles.avatar}
             top="64"
@@ -138,10 +130,7 @@ export default function About() {
                 onBackground="accent-weak"
                 name="globe"
               />
-
-              {language === "fr"
-                ? "Canada / Est"
-                : "Canada / Eastern"}
+              {person.location}
             </Row>
 
             {person.languages &&
@@ -149,10 +138,7 @@ export default function About() {
                 <Row wrap gap="8">
                   {person.languages.map(
                     (languageItem, index) => (
-                      <Tag
-                        key={index}
-                        size="l"
-                      >
+                      <Tag key={index} size="l">
                         {languageItem}
                       </Tag>
                     )
@@ -162,21 +148,21 @@ export default function About() {
           </Column>
         )}
 
-        {/* ABOUT CONTENT */}
+        {/* MAIN CONTENT */}
         <Column
           className={styles.blockAlign}
           flex={9}
           maxWidth={40}
         >
-          {/* HEADER */}
+          {/* INTRO */}
           <Column
-            id={currentLabels.introduction}
+            id={content.intro.title}
             fillWidth
             minHeight="160"
             vertical="center"
             marginBottom="32"
           >
-            {about.calendar.display && (
+            {content.calendar.display && (
               <Row
                 fitWidth
                 border="brand-alpha-medium"
@@ -199,11 +185,13 @@ export default function About() {
                 />
 
                 <Row paddingX="8">
-                  {currentLabels.schedule}
+                  {language === "en"
+                    ? "Schedule a call"
+                    : "Planifier un appel"}
                 </Row>
 
                 <IconButton
-                  href={about.calendar.link}
+                  href={content.calendar.link}
                   data-border="rounded"
                   variant="secondary"
                   icon="chevronRight"
@@ -223,12 +211,11 @@ export default function About() {
               variant="display-default-xs"
               onBackground="neutral-weak"
             >
-              {language === "fr"
-                ? "Futur ingénieur en IA, scientifique des données et analyste de données"
-                : person.role}
+              {language === "en"
+                ? person.role
+                : "Futur ingénieur en IA, scientifique des données et analyste de données"}
             </Text>
 
-            {/* SOCIAL LINKS */}
             {social.length > 0 && (
               <Row
                 className={styles.blockAlign}
@@ -277,28 +264,28 @@ export default function About() {
             )}
           </Column>
 
-          {/* INTRODUCTION */}
-          {about.intro.display && (
+          {/* INTRODUCTION DESCRIPTION */}
+          {content.intro.display && (
             <Column
               textVariant="body-default-l"
               fillWidth
               gap="m"
               marginBottom="xl"
             >
-              {about.intro.description}
+              {content.intro.description}
             </Column>
           )}
 
           {/* WORK EXPERIENCE */}
-          {about.work.display && (
+          {content.work.display && (
             <>
               <Heading
                 as="h2"
-                id={currentLabels.work}
+                id={content.work.title}
                 variant="display-strong-s"
                 marginBottom="m"
               >
-                {currentLabels.work}
+                {content.work.title}
               </Heading>
 
               <Column
@@ -306,7 +293,7 @@ export default function About() {
                 gap="l"
                 marginBottom="40"
               >
-                {about.work.experiences.map(
+                {content.work.experiences.map(
                   (experience, index) => (
                     <Column
                       key={`${experience.company}-${experience.role}-${index}`}
@@ -358,6 +345,7 @@ export default function About() {
                         )}
                       </Column>
 
+                      {/* Images */}
                       {experience.images &&
                         experience.images.length > 0 && (
                           <Row
@@ -367,7 +355,7 @@ export default function About() {
                             gap="12"
                             wrap
                           >
-                            {experience.images.map(
+                            {(experience.images as any[]).map(
                               (image, imageIndex) => (
                                 <Row
                                   key={imageIndex}
@@ -396,15 +384,15 @@ export default function About() {
           )}
 
           {/* EDUCATION */}
-          {about.studies.display && (
+          {content.studies.display && (
             <>
               <Heading
                 as="h2"
-                id={currentLabels.education}
+                id={content.studies.title}
                 variant="display-strong-s"
                 marginBottom="m"
               >
-                {currentLabels.education}
+                {content.studies.title}
               </Heading>
 
               <Column
@@ -412,7 +400,7 @@ export default function About() {
                 gap="l"
                 marginBottom="40"
               >
-                {about.studies.institutions.map(
+                {content.studies.institutions.map(
                   (institution, index) => (
                     <Column
                       key={`${institution.name}-${index}`}
@@ -454,19 +442,19 @@ export default function About() {
           )}
 
           {/* TECHNICAL SKILLS */}
-          {about.technical.display && (
+          {content.technical.display && (
             <>
               <Heading
                 as="h2"
-                id={currentLabels.technical}
+                id={content.technical.title}
                 variant="display-strong-s"
                 marginBottom="40"
               >
-                {currentLabels.technical}
+                {content.technical.title}
               </Heading>
 
               <Column fillWidth gap="l">
-                {about.technical.skills.map(
+                {content.technical.skills.map(
                   (skill, index) => (
                     <Column
                       key={`${skill.title}-${index}`}
@@ -516,7 +504,7 @@ export default function About() {
                             gap="12"
                             wrap
                           >
-                            {skill.images.map(
+                            {(skill.images as any[]).map(
                               (image, imageIndex) => (
                                 <Row
                                   key={imageIndex}

@@ -1,39 +1,40 @@
 "use client";
 
 import {
-Heading,
-Text,
-Button,
-Avatar,
-RevealFx,
-Column,
-Badge,
-Row,
+  Heading,
+  Text,
+  Button,
+  Avatar,
+  RevealFx,
+  Column,
+  Badge,
+  Row,
 } from "@once-ui-system/core";
 
 import { useLanguage } from "./LanguageContext";
 import { home, about, person } from "@/resources";
 
 export function HomeContent() {
-const { language } = useLanguage();
+  const { language } = useLanguage();
 
-const content = home[language];
+  const content = home[language];
+  const aboutContent = about[language];
 
-const aboutLabel = language === "en" ? "About" : "À propos";
-
-return (
+  return (
     <Column maxWidth="m" gap="xl" paddingY="12" horizontal="center">
-    <Column fillWidth horizontal="center" gap="m">
+      <Column fillWidth horizontal="center" gap="m">
         <Column maxWidth="s" horizontal="center" align="center">
-        {content.featured.display && (
+
+          {/* Featured work */}
+          {content.featured.display && (
             <RevealFx
-            fillWidth
-            horizontal="center"
-            paddingTop="16"
-            paddingBottom="32"
-            paddingLeft="12"
+              fillWidth
+              horizontal="center"
+              paddingTop="16"
+              paddingBottom="32"
+              paddingLeft="12"
             >
-            <Badge
+              <Badge
                 background="brand-alpha-weak"
                 paddingX="12"
                 paddingY="4"
@@ -49,6 +50,7 @@ return (
             </RevealFx>
           )}
 
+          {/* Headline */}
           <RevealFx
             translateY="4"
             fillWidth
@@ -60,6 +62,7 @@ return (
             </Heading>
           </RevealFx>
 
+          {/* Description */}
           <RevealFx
             translateY="8"
             delay={0.2}
@@ -76,6 +79,7 @@ return (
             </Text>
           </RevealFx>
 
+          {/* About button */}
           <RevealFx
             paddingTop="12"
             delay={0.4}
@@ -85,14 +89,14 @@ return (
             <Button
               id="about"
               data-border="rounded"
-              href={about.path}
+              href={aboutContent.path}
               variant="secondary"
               size="m"
               weight="default"
               arrowIcon
             >
               <Row gap="8" vertical="center" paddingRight="4">
-                {about.avatar.display && (
+                {aboutContent.avatar.display && (
                   <Avatar
                     marginRight="8"
                     style={{ marginLeft: "-0.75rem" }}
@@ -101,10 +105,11 @@ return (
                   />
                 )}
 
-                {aboutLabel}
+                {aboutContent.label}
               </Row>
             </Button>
           </RevealFx>
+
         </Column>
       </Column>
     </Column>
