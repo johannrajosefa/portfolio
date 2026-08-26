@@ -13,13 +13,15 @@ import { Projects } from "@/components/work/Projects";
 import { Posts } from "@/components/blog/Posts";
 import { HomeContent } from "@/components/HomeContent";
 
+const defaultLang = "en";
+
 export async function generateMetadata() {
   return Meta.generate({
-    title: home.title,
-    description: home.description,
+    title: home[defaultLang].title,
+    description: home[defaultLang].description,
     baseURL: baseURL,
-    path: home.path,
-    image: home.image,
+    path: home[defaultLang].path,
+    image: home[defaultLang].image,
   });
 }
 

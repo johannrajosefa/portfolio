@@ -18,6 +18,8 @@ import { ProjectContent } from "@/components/work/ProjectContent";
 import { getPosts } from "@/utils/utils";
 import { getProject } from "@/utils/getProject";
 
+const defaultLang = "en";
+
 export async function generateStaticParams(): Promise<
   { slug: string }[]
 > {
@@ -71,7 +73,7 @@ export async function generateMetadata({
       `/api/og/generate?title=${encodeURIComponent(
         post.metadata.title
       )}`,
-    path: `${work.path}/${slugPath}`,
+    path: `${work[defaultLang].path}/${slugPath}`,
   });
 }
 
@@ -115,7 +117,7 @@ export default async function Project({
       <Schema
         as="blogPosting"
         baseURL={baseURL}
-        path={`${work.path}/${slugPath}`}
+        path={`${work[defaultLang].path}/${slugPath}`}
         title={post.metadata.title}
         description={post.metadata.summary}
         datePublished={post.metadata.publishedAt}
@@ -128,7 +130,7 @@ export default async function Project({
         }
         author={{
           name: person.name,
-          url: `${baseURL}${about.path}`,
+          url: `${baseURL}${about[defaultLang].path}`,
           image: `${baseURL}${person.avatar}`,
         }}
       />
