@@ -16,13 +16,15 @@ import {
 import { Footer, Header, RouteGuard, Providers } from "@/components";
 import { baseURL, effects, fonts, style, dataStyle, home, person } from "@/resources";
 
+const defaultLang = "en";
+
 export async function generateMetadata() {
   return Meta.generate({
-    title: home.title,
-    description: home.description,
+    title: home[defaultLang].title,
+    description: home[defaultLang].description,
     baseURL: baseURL,
-    path: home.path,
-    image: home.image,
+    path: home[defaultLang].path,
+    image: home[defaultLang].image,
   });
 }
 
