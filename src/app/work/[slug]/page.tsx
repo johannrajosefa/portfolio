@@ -1,11 +1,8 @@
 import { notFound } from "next/navigation";
-import { getPosts } from "@/utils/utils";
-
 import {
   Meta,
   Schema,
   Column,
-  Heading,
   Line,
 } from "@once-ui-system/core";
 
@@ -14,17 +11,31 @@ import { Metadata } from "next";
 
 import { Projects } from "@/components/work/Projects";
 import { LanguageAwareProject } from "@/components/work/LanguageAwareProject";
+import { LanguageAwareProjectContent } from "@/components/work/LanguageAwareProjectContent";
 import { RelatedProjectsTitle } from "@/components/work/RelatedProjects";
 import { ProjectContent } from "@/components/work/ProjectContent";
+
+import { getPosts } from "@/utils/utils";
 import { getProject } from "@/utils/getProject";
 
 export async function generateStaticParams(): Promise<
   { slug: string }[]
 > {
-  const posts = getPosts(["src", "app", "work", "projects"]);
+  const posts = getPosts([
+    "src",
+    "app",
+    "work",
+    "projects",
+  ]);
 
-  return posts.map((post) => ({
-    slug: post.slug,
+  // Only generate routes for English/base projects.
+  // French files such as malou.fr.mdx are not separate routes.
+  const slugs = posts
+    .map((post) => post.slug)
+    .filter((slug) => !slug.endsWith(".fr"));
+
+  return slugs.map((slug) => ({
+    slug,
   }));
 }
 
@@ -39,11 +50,13 @@ export async function generateMetadata({
     ? routeParams.slug.join("/")
     : routeParams.slug || "";
 
-  const posts = getPosts(["src", "app", "work", "projects"]);
+  const project = getProject(slugPath);
 
-  const post = posts.find(
-    (post) => post.slug === slugPath
-  );
+  if (!project) {
+    return {};
+  }
+
+  const post = project.en || project.fr;
 
   if (!post) {
     return {};
@@ -52,13 +65,13 @@ export async function generateMetadata({
   return Meta.generate({
     title: post.metadata.title,
     description: post.metadata.summary,
-    baseURL: baseURL,
+    baseURL,
     image:
       post.metadata.image ||
       `/api/og/generate?title=${encodeURIComponent(
         post.metadata.title
       )}`,
-    path: `${work.path}/${post.slug}`,
+    path: `${work.path}/${slugPath}`,
   });
 }
 
@@ -73,16 +86,19 @@ export default async function Project({
     ? routeParams.slug.join("/")
     : routeParams.slug || "";
 
-  const post = getPosts([
-    "src",
-    "app",
-    "work",
-    "projects",
-  ]).find((post) => post.slug === slugPath);
+  const project = getProject(slugPath);
+
+  if (!project) {
+    notFound();
+  }
+
+  const post = project.en || project.fr;
 
   if (!post) {
     notFound();
   }
+
+  const frenchPost = project.fr;
 
   const avatars =
     post.metadata.team?.map((member) => ({
@@ -99,7 +115,7 @@ export default async function Project({
       <Schema
         as="blogPosting"
         baseURL={baseURL}
-        path={`${work.path}/${post.slug}`}
+        path={`${work.path}/${slugPath}`}
         title={post.metadata.title}
         description={post.metadata.summary}
         datePublished={post.metadata.publishedAt}
@@ -117,13 +133,26 @@ export default async function Project({
         }}
       />
 
-      {/* Main project content */}
+      {/* Project header */}
       <LanguageAwareProject
-  post={post}
-  avatars={avatars}
-/>
+        post={post}
+        frenchPost={frenchPost}
+        avatars={avatars}
+      />
 
-<ProjectContent content={post.content} />
+      {/* Project content */}
+      <LanguageAwareProjectContent
+        englishContent={
+          project.en ? (
+            <ProjectContent content={project.en.content} />
+          ) : null
+        }
+        frenchContent={
+          project.fr ? (
+            <ProjectContent content={project.fr.content} />
+          ) : null
+        }
+      />
 
       {/* Related projects */}
       <Column
@@ -137,7 +166,7 @@ export default async function Project({
         <RelatedProjectsTitle />
 
         <Projects
-          exclude={[post.slug]}
+          exclude={[slugPath]}
           range={[2]}
         />
       </Column>

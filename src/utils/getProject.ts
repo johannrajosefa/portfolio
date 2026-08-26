@@ -1,37 +1,73 @@
-import { cookies } from "next/headers";
-import { getPosts } from "@/utils/utils";
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
 
-export async function getProject(
-  slug: string
-) {
-  const cookieStore = await cookies();
+const projectsPath = path.join(
+  process.cwd(),
+  "src",
+  "app",
+  "work",
+  "projects"
+);
 
-  const languageCookie = cookieStore.get("language")?.value;
+export interface ProjectData {
+  metadata: {
+    title: string;
+    subtitle?: string;
+    publishedAt: string;
+    summary: string;
+    image?: string;
+    images: string[];
+    tag?: string;
+    team: {
+      name: string;
+      role: string;
+      avatar: string;
+      linkedIn: string;
+    }[];
+    link?: string;
+  };
+  slug: string;
+  content: string;
+}
 
-  const language =
-    languageCookie === "fr" ? "fr" : "en";
+function readProject(fileName: string): ProjectData | null {
+  const filePath = path.join(projectsPath, fileName);
 
-  const posts = getPosts([
-    "src",
-    "app",
-    "work",
-    "projects",
-  ]);
-
-  const project = posts.find(
-    (post) =>
-      post.slug === slug &&
-      post.language === language
-  );
-
-  // Fallback to English if French version doesn't exist
-  if (!project && language === "fr") {
-    return posts.find(
-      (post) =>
-        post.slug === slug &&
-        post.language === "en"
-    );
+  if (!fs.existsSync(filePath)) {
+    return null;
   }
 
-  return project;
+  const rawContent = fs.readFileSync(filePath, "utf-8");
+  const { data, content } = matter(rawContent);
+
+  return {
+    slug: fileName.replace(/\.mdx$/, "").replace(/\.fr$/, ""),
+    metadata: {
+      title: data.title || "",
+      subtitle: data.subtitle || "",
+      publishedAt: data.publishedAt || "",
+      summary: data.summary || "",
+      image: data.image || "",
+      images: data.images || [],
+      tag: data.tag || "",
+      team: data.team || [],
+      link: data.link || "",
+    },
+    content,
+  };
+}
+
+export function getProject(slug: string) {
+  const english = readProject(`${slug}.mdx`);
+  const french = readProject(`${slug}.fr.mdx`);
+
+  if (!english && !french) {
+    return null;
+  }
+
+  return {
+    en: english,
+    fr: french,
+  };
 }

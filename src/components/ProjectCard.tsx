@@ -12,6 +12,22 @@ import {
 
 import { useLanguage } from "@/components/LanguageContext";
 
+interface ProjectTranslation {
+  metadata: {
+    title: string;
+    summary: string;
+    images: string[];
+    team: {
+      name: string;
+      role: string;
+      avatar: string;
+      linkedIn: string;
+    }[];
+    link?: string;
+  };
+  content: string;
+}
+
 interface ProjectCardProps {
   href: string;
   priority?: boolean;
@@ -21,6 +37,7 @@ interface ProjectCardProps {
   description: string;
   avatars: { src: string }[];
   link: string;
+  translation?: ProjectTranslation;
 }
 
 export const ProjectCard: React.FC<ProjectCardProps> = ({
@@ -31,17 +48,37 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   description,
   avatars,
   link,
+  translation,
 }) => {
   const { language } = useLanguage();
 
+  const isFrench =
+    language === "fr" && !!translation;
+
+  const currentTitle = isFrench
+    ? translation!.metadata.title
+    : title;
+
+  const currentDescription = isFrench
+    ? translation!.metadata.summary
+    : description;
+
+  const currentImages = isFrench
+    ? translation!.metadata.images
+    : images;
+
+  const currentLink = isFrench
+    ? translation!.metadata.link || link
+    : link;
+
   const labels = {
     en: {
-      readCaseStudy: "Read case study",
-      viewProject: "View project",
+      read: "Read case study",
+      view: "View project",
     },
     fr: {
-      readCaseStudy: "Lire l'étude de cas",
-      viewProject: "Voir le projet",
+      read: "Lire l'étude de cas",
+      view: "Voir le projet",
     },
   };
 
@@ -51,9 +88,9 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
     <Column fillWidth gap="m">
       <Carousel
         sizes="(max-width: 960px) 100vw, 960px"
-        items={images.map((image) => ({
+        items={currentImages.map((image) => ({
           slide: image,
-          alt: title,
+          alt: currentTitle,
         }))}
       />
 
@@ -65,20 +102,20 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
         paddingBottom="24"
         gap="l"
       >
-        {title && (
+        {currentTitle && (
           <Flex flex={5}>
             <Heading
               as="h2"
               wrap="balance"
               variant="heading-strong-xl"
             >
-              {title}
+              {currentTitle}
             </Heading>
           </Flex>
         )}
 
         {(avatars?.length > 0 ||
-          description?.trim() ||
+          currentDescription?.trim() ||
           content?.trim()) && (
           <Column flex={7} gap="16">
             {avatars?.length > 0 && (
@@ -89,13 +126,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
               />
             )}
 
-            {description?.trim() && (
+            {currentDescription?.trim() && (
               <Text
                 wrap="balance"
                 variant="body-default-s"
                 onBackground="neutral-weak"
               >
-                {description}
+                {currentDescription}
               </Text>
             )}
 
@@ -110,22 +147,22 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
                   href={href}
                 >
                   <Text variant="body-default-s">
-                    {text.readCaseStudy}
+                    {text.read}
                   </Text>
                 </SmartLink>
               )}
 
-              {link && (
+              {currentLink && (
                 <SmartLink
                   suffixIcon="arrowUpRightFromSquare"
                   style={{
                     margin: "0",
                     width: "fit-content",
                   }}
-                  href={link}
+                  href={currentLink}
                 >
                   <Text variant="body-default-s">
-                    {text.viewProject}
+                    {text.view}
                   </Text>
                 </SmartLink>
               )}

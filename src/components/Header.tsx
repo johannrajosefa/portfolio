@@ -276,6 +276,13 @@ export const Header = () => {
                 </>
               )}
 
+{display.themeSwitcher && (
+                <>
+                  <Line background="neutral-alpha-medium" vert maxHeight="24" />
+                  <ThemeToggle />
+                </>
+              )}
+
               {/* LANGUAGE TOGGLE */}
               {display.themeSwitcher && (
                 <>

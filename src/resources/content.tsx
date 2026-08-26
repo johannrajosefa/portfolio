@@ -77,7 +77,7 @@ const home = {
           </Text>
         </Row>
       ),
-      href: "/work/building-once-ui-a-customizable-design-system",
+      href: "/work/malou",
     },
 
     subline: (
@@ -112,7 +112,7 @@ const home = {
           </Text>
         </Row>
       ),
-      href: "/work/building-once-ui-a-customizable-design-system",
+      href: "/work/malou.fr",
     },
 
     subline: (

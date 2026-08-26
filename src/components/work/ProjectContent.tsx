@@ -5,9 +5,7 @@ interface ProjectContentProps {
   content: string;
 }
 
-export function ProjectContent({
-  content,
-}: ProjectContentProps) {
+export function ProjectContent({ content }: ProjectContentProps) {
   return (
     <Column
       style={{ margin: "auto" }}
