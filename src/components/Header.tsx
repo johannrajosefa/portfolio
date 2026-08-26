@@ -3,23 +3,44 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { Fade, Flex, Line, Row, ToggleButton } from "@once-ui-system/core";
+import {
+  Fade,
+  Flex,
+  Line,
+  Row,
+  ToggleButton,
+} from "@once-ui-system/core";
 
-import { routes, display, person, about, blog, work, gallery } from "@/resources";
+import {
+  routes,
+  display,
+  person,
+  about,
+  blog,
+  work,
+  gallery,
+} from "@/resources";
+
 import { ThemeToggle } from "./ThemeToggle";
+import { LanguageToggle } from "./LanguageToggle";
+import { useLanguage } from "./LanguageContext";
 import styles from "./Header.module.scss";
 
 type TimeDisplayProps = {
   timeZone: string;
-  locale?: string; // Optionally allow locale, defaulting to 'en-GB'
+  language: "en" | "fr";
 };
 
-const TimeDisplay: React.FC<TimeDisplayProps> = ({ timeZone, locale = "en-GB" }) => {
+const TimeDisplay: React.FC<TimeDisplayProps> = ({
+  timeZone,
+  language,
+}) => {
   const [currentTime, setCurrentTime] = useState("");
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
+
       const options: Intl.DateTimeFormatOptions = {
         timeZone,
         hour: "2-digit",
@@ -27,17 +48,34 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({ timeZone, locale = "en-GB" })
         second: "2-digit",
         hour12: false,
       };
-      const timeString = new Intl.DateTimeFormat(locale, options).format(now);
+
+      const locale = language === "fr" ? "fr-CA" : "en-CA";
+
+      const timeString = new Intl.DateTimeFormat(
+        locale,
+        options
+      ).format(now);
+
       setCurrentTime(timeString);
     };
 
     updateTime();
+
     const intervalId = setInterval(updateTime, 1000);
 
     return () => clearInterval(intervalId);
-  }, [timeZone, locale]);
+  }, [timeZone, language]);
 
-  return <>My current time : {currentTime}</>;
+  const label =
+    language === "fr"
+      ? "Heure actuelle :"
+      : "My current time:";
+
+  return (
+    <>
+      {label} {currentTime}
+    </>
+  );
 };
 
 export default TimeDisplay;
@@ -45,9 +83,40 @@ export default TimeDisplay;
 export const Header = () => {
   const pathname = usePathname() ?? "";
 
+  const { language } = useLanguage();
+
+  const navLabels = {
+    en: {
+      about: "About",
+      projects: "Projects",
+      blog: "Blog",
+      gallery: "Gallery",
+    },
+    fr: {
+      about: "À propos",
+      projects: "Projets",
+      blog: "Blog",
+      gallery: "Galerie",
+    },
+  };
+
+  const labels = navLabels[language];
+
+  const locationLabel =
+    language === "fr"
+      ? "Canada / Est"
+      : "Canada / Eastern";
+
   return (
     <>
-      <Fade s={{ hide: true }} fillWidth position="fixed" height="80" zIndex={9} />
+      <Fade
+        s={{ hide: true }}
+        fillWidth
+        position="fixed"
+        height="80"
+        zIndex={9}
+      />
+
       <Fade
         hide
         s={{ hide: false }}
@@ -58,6 +127,7 @@ export const Header = () => {
         height="80"
         zIndex={9}
       />
+
       <Row
         fitHeight
         className={styles.position}
@@ -72,9 +142,21 @@ export const Header = () => {
           position: "fixed",
         }}
       >
-        <Row paddingLeft="12" fillWidth vertical="center" textVariant="body-default-s">
-          {display.location && <Row s={{ hide: true }}>{person.location}</Row>}
+        {/* LEFT SIDE — LOCATION */}
+        <Row
+          paddingLeft="12"
+          fillWidth
+          vertical="center"
+          textVariant="body-default-s"
+        >
+          {display.location && (
+            <Row s={{ hide: true }}>
+              {locationLabel}
+            </Row>
+          )}
         </Row>
+
+        {/* CENTER — NAVIGATION */}
         <Row fillWidth horizontal="center">
           <Row
             background="page"
@@ -85,21 +167,39 @@ export const Header = () => {
             horizontal="center"
             zIndex={1}
           >
-            <Row gap="4" vertical="center" textVariant="body-default-s" suppressHydrationWarning>
+            <Row
+              gap="4"
+              vertical="center"
+              textVariant="body-default-s"
+              suppressHydrationWarning
+            >
+              {/* HOME */}
               {routes["/"] && (
-                <ToggleButton prefixIcon="home" href="/" selected={pathname === "/"} />
+                <ToggleButton
+                  prefixIcon="home"
+                  href="/"
+                  selected={pathname === "/"}
+                />
               )}
-              <Line background="neutral-alpha-medium" vert maxHeight="24" />
+
+              <Line
+                background="neutral-alpha-medium"
+                vert
+                maxHeight="24"
+              />
+
+              {/* ABOUT */}
               {routes["/about"] && (
                 <>
                   <Row s={{ hide: true }}>
                     <ToggleButton
                       prefixIcon="person"
                       href="/about"
-                      label={about.label}
+                      label={labels.about}
                       selected={pathname === "/about"}
                     />
                   </Row>
+
                   <Row hide s={{ hide: false }}>
                     <ToggleButton
                       prefixIcon="person"
@@ -109,16 +209,19 @@ export const Header = () => {
                   </Row>
                 </>
               )}
+
+              {/* PROJECTS */}
               {routes["/work"] && (
                 <>
                   <Row s={{ hide: true }}>
                     <ToggleButton
                       prefixIcon="grid"
                       href="/work"
-                      label={"Projects"}
+                      label={labels.projects}
                       selected={pathname.startsWith("/work")}
                     />
                   </Row>
+
                   <Row hide s={{ hide: false }}>
                     <ToggleButton
                       prefixIcon="grid"
@@ -128,16 +231,19 @@ export const Header = () => {
                   </Row>
                 </>
               )}
+
+              {/* BLOG */}
               {routes["/blog"] && (
                 <>
                   <Row s={{ hide: true }}>
                     <ToggleButton
                       prefixIcon="book"
                       href="/blog"
-                      label={blog.label}
+                      label={labels.blog}
                       selected={pathname.startsWith("/blog")}
                     />
                   </Row>
+
                   <Row hide s={{ hide: false }}>
                     <ToggleButton
                       prefixIcon="book"
@@ -147,16 +253,19 @@ export const Header = () => {
                   </Row>
                 </>
               )}
+
+              {/* GALLERY */}
               {routes["/gallery"] && (
                 <>
                   <Row s={{ hide: true }}>
                     <ToggleButton
                       prefixIcon="gallery"
                       href="/gallery"
-                      label={gallery.label}
+                      label={labels.gallery}
                       selected={pathname.startsWith("/gallery")}
                     />
                   </Row>
+
                   <Row hide s={{ hide: false }}>
                     <ToggleButton
                       prefixIcon="gallery"
@@ -166,16 +275,36 @@ export const Header = () => {
                   </Row>
                 </>
               )}
-              {display.themeSwitcher && (
+
+{display.themeSwitcher && (
                 <>
                   <Line background="neutral-alpha-medium" vert maxHeight="24" />
                   <ThemeToggle />
                 </>
               )}
+
+              {/* LANGUAGE TOGGLE */}
+              {display.themeSwitcher && (
+                <>
+                  <Line
+                    background="neutral-alpha-medium"
+                    vert
+                    maxHeight="24"
+                  />
+
+                  <LanguageToggle />
+                </>
+              )}
             </Row>
           </Row>
         </Row>
-        <Flex fillWidth horizontal="end" vertical="center">
+
+        {/* RIGHT SIDE — CURRENT TIME */}
+        <Flex
+          fillWidth
+          horizontal="end"
+          vertical="center"
+        >
           <Flex
             paddingRight="12"
             horizontal="end"
@@ -184,7 +313,12 @@ export const Header = () => {
             gap="20"
           >
             <Flex s={{ hide: true }}>
-              {display.time && <TimeDisplay timeZone={person.location} />}
+              {display.time && (
+                <TimeDisplay
+                  timeZone="America/Toronto"
+                  language={language}
+                />
+              )}
             </Flex>
           </Flex>
         </Flex>
