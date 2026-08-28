@@ -19,7 +19,7 @@ const person: Person = {
   role: "aspiring AI Engineer, Data Scientist, and Data Analyst",
   avatar: "/images/avatar.png",
   email: "johann.rajosefa@gmail.com",
-  location: "America/Toronto",
+  location: "Canada/Eastern",
   languages: ["English", "Français"],
   locale: "en",
 };
